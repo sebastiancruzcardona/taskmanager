@@ -34,6 +34,7 @@ ehthumbs.db
 bin/
 build/
 out/
+.env
 
 ### STS ###
 .apt_generated
