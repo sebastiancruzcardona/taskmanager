@@ -1,0 +1,53 @@
+# --- Maven ---
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# --- IDEs ---
+.idea/
+.settings/
+.project
+.classpath
+.factorypath
+.sts4-cache/
+.apt_generated/
+*.iml
+*.iws
+*.ipr
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# --- Logs ---
+*.log
+
+# --- Otros ---
+.vscode/
+bin/
+build/
+out/
+
+### STS ###
+.apt_generated
+.settings
+.springBeans
+.sts4-cache
+
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
