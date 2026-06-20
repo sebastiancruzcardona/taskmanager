@@ -7,17 +7,17 @@ import com.example.taskmanager.repository.TaskRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     // Constructor Injection
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
+        this.modelMapper = modelMapper;
     }
 
     public TaskDto createTask(TaskDto taskDto) {
