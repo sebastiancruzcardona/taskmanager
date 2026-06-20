@@ -28,14 +28,9 @@ public class TaskService {
     }
 
     public List<TaskDto> getAllTasks() {
-        List<Task> tasks = taskRepository.findAll();
-        List<TaskDto> taskDtos = new ArrayList<>();
-
-        for (Task task : tasks) {
-            taskDtos.add(modelMapper.map(task, TaskDto.class));
-        }
-
-        return taskDtos;
+        return taskRepository.findAll().stream()
+                .map(task -> modelMapper.map(task, TaskDto.class))
+                .toList();
     }
 
     public TaskDto getTaskById(Integer id) {
