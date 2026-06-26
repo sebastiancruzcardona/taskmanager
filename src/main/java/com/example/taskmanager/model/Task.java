@@ -1,5 +1,6 @@
 package com.example.taskmanager.model;
 
+import com.example.taskmanager.enums.TaskStatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,8 @@ public class Task {
     private String description;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING) // This is an enum and the db wants it as a String
+    private TaskStatusEnum status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -42,7 +44,7 @@ public class Task {
         return description;
     }
 
-    public String getStatus() {
+    public TaskStatusEnum getStatus() {
         return status;
     }
 
@@ -63,7 +65,7 @@ public class Task {
         this.description = description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatusEnum status) {
         this.status = status;
     }
 
