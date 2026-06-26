@@ -1,7 +1,12 @@
 package com.example.taskmanager.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
@@ -10,32 +15,6 @@ public class ErrorResponse {
     public ErrorResponse(int status, String message) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
-        this.message = message;
-    }
-
-    // Getters
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    // Setters
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
     }
 }
