@@ -4,21 +4,17 @@ import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
-
-    // Constructor Injection
-    public TaskService(TaskRepository taskRepository, ModelMapper modelMapper) {
-        this.taskRepository = taskRepository;
-        this.modelMapper = modelMapper;
-    }
 
     public TaskDto createTask(TaskDto taskDto) {
         Task task = modelMapper.map(taskDto, Task.class);
@@ -28,16 +24,16 @@ public class TaskService {
     }
 
     public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll().stream()
+        return taskRepository.findAll()
+                .stream()
                 .map(task -> modelMapper.map(task, TaskDto.class))
                 .toList();
     }
 
     public TaskDto getTaskById(Integer id) {
-        Task task = taskRepository.findById(id)
+        return taskRepository.findById(id)
+                .map(task -> modelMapper.map(task, TaskDto.class))
                 .orElseThrow(() -> new TaskNotFoundException(id));
-
-        return modelMapper.map(task, TaskDto.class);
     }
 
     public TaskDto updateTask(Integer id, TaskDto taskDto) {
