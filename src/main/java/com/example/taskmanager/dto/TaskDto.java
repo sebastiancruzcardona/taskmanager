@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 public class TaskDto {
 
     private Integer id;
+
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String description;
 
     private TaskStatusEnum status;
