@@ -1,18 +1,22 @@
 package com.example.taskmanager.dto;
 
+import com.example.taskmanager.enums.TaskStatusEnum;
+import jakarta.validation.constraints.NotBlank;
+
 public class TaskDto {
 
     private Integer id;
     private String title;
     private String description;
-    private String status;
 
-    // Default Cosntructor
+    private TaskStatusEnum status;
+
+    // Default Constructor
     public TaskDto() {
     }
 
     // All parameter Constructor
-    public TaskDto(Integer id, String title, String description, String status) {
+    public TaskDto(Integer id, String title, String description, TaskStatusEnum status) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -32,7 +36,7 @@ public class TaskDto {
         return description;
     }
 
-    public String getStatus() {
+    public TaskStatusEnum getStatus() {
         return status;
     }
 
@@ -49,7 +53,7 @@ public class TaskDto {
         this.description = description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatusEnum status) {
         this.status = status;
     }
 }
