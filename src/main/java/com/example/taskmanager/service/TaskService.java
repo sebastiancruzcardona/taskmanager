@@ -1,13 +1,20 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.TaskDto;
+import com.example.taskmanager.exception.FieldConstraintsViolationException;
+import com.example.taskmanager.exception.InvalidFileFormatException;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,6 +28,15 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
 
         return modelMapper.map(savedTask, TaskDto.class);
+    }
+
+    public void createMultipleTasks(List<TaskDto> taskDtos) {
+        List<Task> tasks = taskDtos
+                .stream()
+                .map(taskDto -> modelMapper.map(taskDto, Task.class))
+                .toList();
+
+        taskRepository.saveAll(tasks);
     }
 
     public List<TaskDto> getAllTasks() {
