@@ -24,8 +24,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    private final ObjectMapper objectMapper;
-    private final Validator validator; // This also has a default value as the objectmapper
 
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@Valid @RequestBody TaskDto taskDto) {
@@ -34,32 +32,8 @@ public class TaskController {
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data") // consumes: tells the request from where to consume its data
     public ResponseEntity<String> uploadTask(@RequestParam("file") MultipartFile file) {
-        // Transform into String
-        try {
-            // From file to String
-            String json = new String(file.getBytes());
-
-            // From String (JSON) to raw array to List<TaskDto>
-            List<TaskDto> taskDtos = Arrays.asList(objectMapper.readValue(json, TaskDto[].class));
-
-            List<String> violationMessages = taskDtos
-                    .stream()
-                    .flatMap(dto -> validator.validate(dto).stream())
-                    .map(ConstraintViolation::getMessage)
-                    .toList();
-
-            if (!violationMessages.isEmpty()) {
-                return ResponseEntity.badRequest().body(String.join("\n", violationMessages));
-            }
-
-            // Call service
-            taskService.createMultipleTasks(taskDtos);
-
-            return ResponseEntity.ok("Uploaded " + taskDtos.size() + " tasks");
-        }
-        catch (Exception e) {
-            throw new InvalidFileFormatException("Invalid file format");
-        }
+        int created = taskService.createMultipleTasks(file);
+        return ResponseEntity.ok("Uploaded " + created + " tasks");
     }
 
     @GetMapping
