@@ -15,10 +15,10 @@ public class TaskDto {
 
     private Integer id;
 
-    @NotBlank
+    @NotBlank(message = "A title must be provided")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "A description must be provided")
     private String description;
 
     private TaskStatusEnum status;
