@@ -22,6 +22,8 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
+    private final Validator validator;
 
     public TaskDto createTask(TaskDto taskDto) {
         Task task = modelMapper.map(taskDto, Task.class);
@@ -30,13 +32,38 @@ public class TaskService {
         return modelMapper.map(savedTask, TaskDto.class);
     }
 
-    public void createMultipleTasks(List<TaskDto> taskDtos) {
-        List<Task> tasks = taskDtos
+    public int createMultipleTasks(MultipartFile file) {
+        List<Task> tasks = transformToListOfTaskDtos(file)
                 .stream()
                 .map(taskDto -> modelMapper.map(taskDto, Task.class))
                 .toList();
 
         taskRepository.saveAll(tasks);
+
+        return tasks.size();
+    }
+
+    public List<TaskDto> transformToListOfTaskDtos(MultipartFile file) {
+        try {
+            String json = new String(file.getBytes());
+
+            List<TaskDto> taskDtos = Arrays.asList(objectMapper.readValue(json, TaskDto[].class));
+
+            List<String> violationMessages = taskDtos.stream()
+                    .flatMap(dto -> validator.validate(dto).stream())
+                    .map(ConstraintViolation::getMessage)
+                    .toList();
+
+            if (!violationMessages.isEmpty()) {
+                throw new FieldConstraintsViolationException(String.join("\n", violationMessages));
+            }
+
+            return taskDtos;
+
+        }
+        catch (Exception e) {
+            throw new InvalidFileFormatException("Invalid file format");
+        }
     }
 
     public List<TaskDto> getAllTasks() {
