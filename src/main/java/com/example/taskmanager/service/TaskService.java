@@ -51,7 +51,8 @@ public class TaskService {
 
             List<String> violationMessages = taskDtos.stream()
                     .flatMap(dto -> validator.validate(dto).stream())
-                    .map(ConstraintViolation::getMessage)
+                    .map(violation ->
+                            violation.getPropertyPath() + ": " + violation.getMessage())
                     .toList();
 
             if (!violationMessages.isEmpty()) {
