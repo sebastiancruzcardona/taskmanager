@@ -30,6 +30,12 @@ public class Task {
     @Enumerated(EnumType.STRING) // This is an enum and the db wants it as a String
     private TaskStatusEnum status;
 
-    @Column(name = "created_at")
+    // insertable = false -> tells hibernate don't include this in the insert to force default now() in db
+    // updatable = false -> tells hibernate that it won't try to update this later
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
