@@ -7,10 +7,13 @@ import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,11 +70,18 @@ public class TaskService {
         }
     }
 
-    public List<TaskDto> getAllTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(task -> modelMapper.map(task, TaskDto.class))
-                .toList();
+    public Page<TaskDto> getAllTasks(Pageable pageable) {
+
+        Sort forcedSort = Sort.by("title").descending();
+
+        Pageable newPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                forcedSort
+        );
+
+        return taskRepository.findAll(newPageable)
+                .map(task -> modelMapper.map(task, TaskDto.class));
     }
 
     public TaskDto getTaskById(Integer id) {
