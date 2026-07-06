@@ -10,17 +10,17 @@ import com.example.taskmanager.repository.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -30,24 +30,39 @@ public class TaskService {
     private final Validator validator;
 
     public TaskDto createTask(TaskDto taskDto) {
+
+        log.info("Creating task with title: {}", taskDto.getTitle());
+
         Task task = modelMapper.map(taskDto, Task.class);
         Task savedTask = taskRepository.save(task);
+
+        log.info("Task created successfully with id: {}", savedTask.getId());
 
         return modelMapper.map(savedTask, TaskDto.class);
     }
 
     public int createMultipleTasks(MultipartFile file) {
-        List<Task> tasks = transformToListOfTaskDtos(file)
+
+        List<TaskDto> taskDtos = transformToListOfTaskDtos(file);
+
+        log.info("Creating {} tasks in bulk", taskDtos.size());
+
+        List<Task> tasks = taskDtos
                 .stream()
                 .map(taskDto -> modelMapper.map(taskDto, Task.class))
                 .toList();
 
         taskRepository.saveAll(tasks);
 
+        log.info("Bulk task creation completed successfully");
+
         return tasks.size();
     }
 
     public List<TaskDto> transformToListOfTaskDtos(MultipartFile file) {
+
+        log.info("POST /tasks/upload called with file {}", file.getOriginalFilename());
+
         try {
             String json = new String(file.getBytes());
 
@@ -60,46 +75,78 @@ public class TaskService {
                     .toList();
 
             if (!violationMessages.isEmpty()) {
+                log.warn("Validation failed while uploading files with {} violations", violationMessages.size());
                 throw new FieldConstraintsViolationException(String.join("\n", violationMessages));
             }
+
+            log.info("File uploaded successfully");
 
             return taskDtos;
 
         }
         catch (Exception e) {
+            log.error("Failed to upload tasks file");
             throw new InvalidFileFormatException("Invalid file format");
         }
     }
 
     public Page<TaskDto> getAllTasks(Pageable pageable) {
 
-        Sort forcedSort = Sort.by("title").descending();
-
-        Pageable newPageable = PageRequest.of(
+        log.info("Fetching tasks with page: {}, size: {} sort: {}",
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                forcedSort
+                pageable.getSort()
         );
 
-        return taskRepository.findAll(newPageable)
+        Page<Task> tasksPage = taskRepository.findAll(pageable);
+
+        log.info("Fetched {} tasks from database", tasksPage.getNumberOfElements());
+
+        return tasksPage
                 .map(task -> modelMapper.map(task, TaskDto.class));
     }
 
     public TaskDto getTaskById(Integer id) {
+
+        log.info("Fetching task with id: {}", id);
+
         return taskRepository.findById(id)
-                .map(task -> modelMapper.map(task, TaskDto.class))
-                .orElseThrow(() -> new TaskNotFoundException(id));
+                .map(task -> {
+                    log.debug("Task found. Id: {}", task.getId());
+                    return modelMapper.map(task, TaskDto.class);
+                })
+                .orElseThrow(() -> {
+                    log.error("Task with id {} not found", id);
+                    return new TaskNotFoundException(id);
+                });
     }
 
     public TaskWithUserDto getTaskWithUserById(Integer id) {
+
+        log.info("Fetching task with user with id: {}", id);
+
         return taskRepository.findById(id)
-                .map(task -> modelMapper.map(task, TaskWithUserDto.class))
-                .orElseThrow(() -> new TaskNotFoundException(id));
+                .map(task -> {
+                    log.debug("Task found. Id: {}", task.getId());
+                    return modelMapper.map(task, TaskWithUserDto.class);
+                })
+                .orElseThrow(() -> {
+                    log.error("Task with id {} not found", id);
+                    return new TaskNotFoundException(id);
+                });
     }
 
     public TaskDto updateTask(Integer id, TaskDto taskDto) {
+
+        log.info("Updating task with id: {}", id);
+
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(id));
+                .orElseThrow(() -> {
+                    log.error("Cannot update the task. Task with id {} not found", id);
+                    return new TaskNotFoundException(id);
+                });
+
+        log.debug("Task found with id: {}", existingTask.getId());
 
         existingTask.setTitle(taskDto.getTitle());
         existingTask.setDescription(taskDto.getDescription());
@@ -107,13 +154,22 @@ public class TaskService {
 
         Task updatedTask = taskRepository.save(existingTask);
 
+        log.info("Task with id {} updated successfully", updatedTask.getId());
+
         return modelMapper.map(updatedTask, TaskDto.class);
     }
 
     public void deleteTask(Integer id) {
+
+        log.info("Deleting task with id: {}", id);
+
         if (!taskRepository.existsById(id)) {
+            log.error("Cannot delete. Task with id {} not found", id);
             throw new TaskNotFoundException(id);
         }
+
         taskRepository.deleteById(id);
+
+        log.info("Task with id {} deleted successfully", id);
     }
 }

@@ -4,9 +4,11 @@ import com.example.taskmanager.dto.UserDto;
 import com.example.taskmanager.dto.UserWithTaskDto;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -16,14 +18,32 @@ public class UserService {
     // TODO: Create the proper exception and replace RuntimeException
 
     public UserDto getUser(Integer id) {
+
+        log.info("Getting user with id {}", id);
+
         return userRepository.findById(id)
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .orElseThrow(() -> new RuntimeException("User with id " + id + "not found"));
+                .map(user -> {
+                    log.debug("User with id {} found", user.getId());
+                    return modelMapper.map(user, UserDto.class);
+                })
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", id);
+                    return new RuntimeException("User with id " + id + "not found");
+                });
     }
 
     public UserWithTaskDto getUserWithTasks(Integer id) {
+
+        log.info("Getting user with tasks with id {}", id);
+
         return userRepository.findById(id)
-                .map(user -> modelMapper.map(user, UserWithTaskDto.class))
-                .orElseThrow(() -> new RuntimeException("User with id " + id + "not found"));
+                .map(user -> {
+                    log.debug("User with id {} found", user.getId());
+                    return modelMapper.map(user, UserWithTaskDto.class);
+                })
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", id);
+                    return new RuntimeException("User with id " + id + "not found");
+                });
     }
 }
