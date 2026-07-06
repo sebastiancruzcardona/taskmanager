@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    public final UserService userService;
+    private final UserService userService;
 
     @GetMapping("/{id}") // Retrieve user without his tasks
     public ResponseEntity<UserDto> getUser(@PathVariable Integer id) {
