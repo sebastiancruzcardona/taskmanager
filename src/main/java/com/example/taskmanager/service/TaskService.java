@@ -1,6 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.TaskDto;
+import com.example.taskmanager.dto.TaskWithUserDto;
 import com.example.taskmanager.exception.FieldConstraintsViolationException;
 import com.example.taskmanager.exception.InvalidFileFormatException;
 import com.example.taskmanager.exception.TaskNotFoundException;
@@ -87,6 +88,12 @@ public class TaskService {
     public TaskDto getTaskById(Integer id) {
         return taskRepository.findById(id)
                 .map(task -> modelMapper.map(task, TaskDto.class))
+                .orElseThrow(() -> new TaskNotFoundException(id));
+    }
+
+    public TaskWithUserDto getTaskWithUserById(Integer id) {
+        return taskRepository.findById(id)
+                .map(task -> modelMapper.map(task, TaskWithUserDto.class))
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
