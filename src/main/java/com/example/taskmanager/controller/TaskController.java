@@ -1,6 +1,7 @@
 package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.TaskDto;
+import com.example.taskmanager.dto.TaskWithUserDto;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
@@ -41,6 +40,11 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getTaskById(@PathVariable Integer id) {
         return ResponseEntity.ok(taskService.getTaskById(id));
+    }
+
+    @GetMapping("/withUser/{id}")
+    public ResponseEntity<TaskWithUserDto> getTaskWithUserById(@PathVariable Integer id) {
+        return ResponseEntity.ok(taskService.getTaskWithUserById(id));
     }
 
     @PutMapping("/{id}")
