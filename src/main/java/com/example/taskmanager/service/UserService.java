@@ -2,6 +2,7 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.UserDto;
 import com.example.taskmanager.dto.UserWithTaskDto;
+import com.example.taskmanager.exception.UserNotFoundException;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class UserService {
                 })
                 .orElseThrow(() -> {
                     log.error("User with id {} not found", id);
-                    return new RuntimeException("User with id " + id + "not found");
+                    return new UserNotFoundException(id);
                 });
     }
 
@@ -43,7 +44,7 @@ public class UserService {
                 })
                 .orElseThrow(() -> {
                     log.error("User with id {} not found", id);
-                    return new RuntimeException("User with id " + id + "not found");
+                    return new UserNotFoundException(id);
                 });
     }
 }
