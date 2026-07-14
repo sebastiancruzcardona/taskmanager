@@ -16,8 +16,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    // TODO: Create the proper exception and replace RuntimeException
-
     public UserDto getUser(Integer id) {
 
         log.info("Getting user with id {}", id);
