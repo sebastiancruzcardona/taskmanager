@@ -2,13 +2,10 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.dto.TaskWithUserDto;
-import com.example.taskmanager.exception.FieldConstraintsViolationException;
-import com.example.taskmanager.exception.InvalidFileFormatException;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
+import com.example.taskmanager.parser.TasksFileParser;
 import com.example.taskmanager.repository.TaskRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -26,8 +22,7 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
-    private final ObjectMapper objectMapper;
-    private final Validator validator;
+    private final TasksFileParser parser;
 
     public TaskDto createTask(TaskDto taskDto) {
 
@@ -43,7 +38,7 @@ public class TaskService {
 
     public int createMultipleTasks(MultipartFile file) {
 
-        List<TaskDto> taskDtos = transformToListOfTaskDtos(file);
+        List<TaskDto> taskDtos = parser.parseTaskDtos(file);
 
         log.info("Creating {} tasks in bulk", taskDtos.size());
 
@@ -57,37 +52,6 @@ public class TaskService {
         log.info("Bulk task creation completed successfully");
 
         return tasks.size();
-    }
-
-    public List<TaskDto> transformToListOfTaskDtos(MultipartFile file) {
-
-        log.info("POST /tasks/upload called with file {}", file.getOriginalFilename());
-
-        try {
-            String json = new String(file.getBytes());
-
-            List<TaskDto> taskDtos = Arrays.asList(objectMapper.readValue(json, TaskDto[].class));
-
-            List<String> violationMessages = taskDtos.stream()
-                    .flatMap(dto -> validator.validate(dto).stream())
-                    .map(violation ->
-                            violation.getPropertyPath() + ": " + violation.getMessage())
-                    .toList();
-
-            if (!violationMessages.isEmpty()) {
-                log.warn("Validation failed while uploading files with {} violations", violationMessages.size());
-                throw new FieldConstraintsViolationException(String.join("\n", violationMessages));
-            }
-
-            log.info("File uploaded successfully");
-
-            return taskDtos;
-
-        }
-        catch (Exception e) {
-            log.error("Failed to upload tasks file");
-            throw new InvalidFileFormatException("Invalid file format");
-        }
     }
 
     public Page<TaskDto> getAllTasks(Pageable pageable) {
