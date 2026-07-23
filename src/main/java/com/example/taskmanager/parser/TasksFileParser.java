@@ -3,7 +3,6 @@ package com.example.taskmanager.parser;
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.exception.FieldConstraintsViolationException;
 import com.example.taskmanager.exception.InvalidFileFormatException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +47,8 @@ public class TasksFileParser {
             return taskDtos;
 
         }
-        catch (JsonProcessingException e) {
-            log.error("Failed to parse file uploaded", e);
-            throw new InvalidFileFormatException("Invalid file format");
-        }
         catch (IOException e) {
-            log.error("Failed to read file", e);
+            log.error("Failed to parse uploaded file", e);
             throw new InvalidFileFormatException("Invalid file format");
         }
     }
