@@ -36,35 +36,18 @@ public class UserControllerIntegrationTest {
     }
 
     // ---------------------------
-    // getUser
+    // getUserById
     // ---------------------------
 
     @Test
-    void getUser_shouldReturn200_whenUserExists() throws Exception {
-        mockMvc.perform(get("/users/{id}", 1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Sebastian"));
-    }
-
-    @Test
-    void getUser_shouldReturn404_whenUserDoesNotExist() throws Exception {
-        mockMvc.perform(get("/users/{id}", 999))
-                .andExpect(status().isNotFound());
-    }
-
-    // ---------------------------
-    // getUserWithTasks
-    // ---------------------------
-
-    @Test
-    void getUserWithTasks_shouldReturn200_whenUserExists() throws Exception {
+    void getUserById_shouldReturn200_whenUserExists() throws Exception {
         mockMvc.perform(get("/users/withTasks/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("sbs@example.com"));
     }
 
     @Test
-    void getUserWithTasks_shouldReturn404_whenUserDoesNotExist() throws Exception {
+    void getUserById_shouldReturn404_whenUserDoesNotExist() throws Exception {
         mockMvc.perform(get("/users/withTasks/{id}", 999))
                 .andExpect(status().isNotFound());
     }

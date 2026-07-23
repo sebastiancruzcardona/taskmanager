@@ -1,6 +1,5 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.dto.UserDto;
 import com.example.taskmanager.dto.UserWithTaskDto;
 import com.example.taskmanager.exception.UserNotFoundException;
 import com.example.taskmanager.model.User;
@@ -31,45 +30,11 @@ public class UserServiceTest {
     private UserService userService;
 
     // ---------------------------
-    // getUser
+    // getUserById
     // ---------------------------
 
     @Test
-    void getUser_shouldReturnUserDto_whenUserExists() {
-        Integer userId = 1;
-
-        User user = new User();
-        user.setId(userId);
-
-        UserDto userDto = new UserDto();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-        when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
-
-        UserDto result = userService.getUser(userId);
-
-        assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(userDto);
-    }
-
-    @Test
-    void getUser_shouldThrowException_whenUserNotFound() {
-        Integer userId = 1;
-
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userService.getUser(userId))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("User with id " + userId + " not found");
-    }
-
-    // ---------------------------
-    // getUserWithTasks
-    // ---------------------------
-
-    @Test
-    void getUserWithTasks_shouldReturnUserDto_whenUserExists() {
+    void getUserById_shouldReturnUserDto_whenUserExists() {
         Integer userId = 1;
 
         User user = new User();
@@ -82,19 +47,19 @@ public class UserServiceTest {
         when(modelMapper.map(user, UserWithTaskDto.class))
                 .thenReturn(userWithTaskDto);
 
-        UserWithTaskDto result = userService.getUserWithTasks(userId);
+        UserWithTaskDto result = userService.getUserById(userId);
 
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(userWithTaskDto);
     }
 
     @Test
-    void getUserWithTasks_shouldThrowException_whenUserNotFound() {
+    void getUserById_shouldThrowException_whenUserNotFound() {
         Integer userId = 1;
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.getUserWithTasks(userId))
+        assertThatThrownBy(() -> userService.getUserById(userId))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("User with id " + userId + " not found");
     }
