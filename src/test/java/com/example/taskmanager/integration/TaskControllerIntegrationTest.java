@@ -109,13 +109,6 @@ public class TaskControllerIntegrationTest {
                 .andExpect(content().string(containsString("Invalid file format")));
     }
 
-//    @Test
-//    void uploadTasks_shouldReturn500_whenOtherExceptionIsThrown() throws Exception {
-//        mockMvc.perform(multipart("/tasks/upload"))
-//                .andExpect(status().isInternalServerError())
-//                .andExpect(content().string(containsString("Something went wrong:")));
-//    }
-
     // ---------------------------
     // GET /tasks
     // ---------------------------
@@ -137,7 +130,6 @@ public class TaskControllerIntegrationTest {
 
     @Test
     void getTaskById_shouldReturnTask() throws Exception {
-        // Create a task
         String response = createTask(TaskDto.builder()
                 .title("Find me")
                 .description("Find me")
@@ -145,8 +137,7 @@ public class TaskControllerIntegrationTest {
                 .build()
         );
 
-        // From String to TaskDto
-        TaskDto created = objectMapper.readValue(response, TaskDto.class);
+        TaskWithUserDto created = objectMapper.readValue(response, TaskWithUserDto.class);
 
         mockMvc.perform(get("/tasks/{id}", created.getId()))
                 .andExpect(status().isOk())
@@ -156,32 +147,6 @@ public class TaskControllerIntegrationTest {
     @Test
     void getTaskById_shouldReturn404_whenNotFound() throws Exception {
         mockMvc.perform(get("/tasks/{id}", 999))
-                .andExpect(status().isNotFound());
-    }
-
-    // ---------------------------
-    // GET /tasks/withUser/{id}
-    // ---------------------------
-
-    @Test
-    void getTaskWithUserById_shouldReturnTask() throws Exception {
-        String response = createTask(TaskDto.builder()
-                .title("Find me with user")
-                .description("Find me with user")
-                .status(TaskStatusEnum.NEW)
-                .build()
-        );
-
-        TaskWithUserDto created = objectMapper.readValue(response, TaskWithUserDto.class);
-
-        mockMvc.perform(get("/tasks/withUser/{id}", created.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Find me with user"));
-    }
-
-    @Test
-    void getTaskWithUserById_shouldReturn404_whenNotFound() throws Exception {
-        mockMvc.perform(get("/tasks/withUser/{id}", 999))
                 .andExpect(status().isNotFound());
     }
 

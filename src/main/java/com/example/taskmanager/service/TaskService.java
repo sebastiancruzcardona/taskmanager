@@ -70,22 +70,7 @@ public class TaskService {
                 .map(task -> modelMapper.map(task, TaskDto.class));
     }
 
-    public TaskDto getTaskById(Integer id) {
-
-        log.info("Fetching task with id: {}", id);
-
-        return taskRepository.findById(id)
-                .map(task -> {
-                    log.debug("Task found. Id: {}", task.getId());
-                    return modelMapper.map(task, TaskDto.class);
-                })
-                .orElseThrow(() -> {
-                    log.error("Task with id {} not found", id);
-                    return new TaskNotFoundException(id);
-                });
-    }
-
-    public TaskWithUserDto getTaskWithUserById(Integer id) {
+    public TaskWithUserDto getTaskById(Integer id) {
 
         log.info("Fetching task with user with id: {}", id);
 

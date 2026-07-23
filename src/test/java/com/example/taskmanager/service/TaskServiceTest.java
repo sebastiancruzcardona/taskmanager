@@ -136,42 +136,6 @@ public class TaskServiceTest {
     // ---------------------------
 
     @Test
-    void getTaskById_shouldReturnTaskDto() {
-        Integer id = 1;
-
-        Task task = new Task();
-        task.setId(id);
-
-        TaskDto dto = new TaskDto();
-
-        when(taskRepository.findById(id))
-                .thenReturn(Optional.of(task));
-
-        when(modelMapper.map(task, TaskDto.class))
-                .thenReturn(dto);
-
-        TaskDto result = taskService.getTaskById(id);
-
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    void getTaskById_shouldThrowException_whenTaskNotFound() {
-        Integer id = 1;
-
-        when(taskRepository.findById(id))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> taskService.getTaskById(id))
-                .isInstanceOf(TaskNotFoundException.class)
-                .hasMessage("Task with id " + id + " not found");
-    }
-
-    // ---------------------------
-    // getTaskWithUserById
-    // ---------------------------
-
-    @Test
     void getTaskWithUserById_shouldReturnTaskDto() {
         Integer id = 1;
 
@@ -186,7 +150,7 @@ public class TaskServiceTest {
         when(modelMapper.map(task, TaskWithUserDto.class))
                 .thenReturn(dto);
 
-        TaskWithUserDto result = taskService.getTaskWithUserById(id);
+        TaskWithUserDto result = taskService.getTaskById(id);
 
         assertThat(result).isNotNull();
     }
@@ -198,7 +162,7 @@ public class TaskServiceTest {
         when(taskRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> taskService.getTaskWithUserById(id))
+        assertThatThrownBy(() -> taskService.getTaskById(id))
                 .isInstanceOf(TaskNotFoundException.class)
                 .hasMessage("Task with id " + id + " not found");
     }

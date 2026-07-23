@@ -38,13 +38,8 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> getTaskById(@PathVariable Integer id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
-    }
-
-    @GetMapping("/withUser/{id}")
     public ResponseEntity<TaskWithUserDto> getTaskWithUserById(@PathVariable Integer id) {
-        return ResponseEntity.ok(taskService.getTaskWithUserById(id));
+        return ResponseEntity.ok(taskService.getTaskById(id));
     }
 
     @PutMapping("/{id}")
