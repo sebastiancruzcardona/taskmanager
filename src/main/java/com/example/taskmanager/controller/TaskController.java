@@ -25,7 +25,7 @@ public class TaskController {
     }
 
     @PostMapping(value = "/upload", consumes = "multipart/form-data") // consumes: tells the request from where to consume its data
-    public ResponseEntity<String> uploadTask(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadTasks(@RequestParam("file") MultipartFile file) {
         int created = taskService.createMultipleTasks(file);
         return ResponseEntity.ok("Uploaded " + created + " tasks");
     }
