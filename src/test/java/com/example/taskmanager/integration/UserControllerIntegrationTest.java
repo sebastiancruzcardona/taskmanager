@@ -41,14 +41,14 @@ public class UserControllerIntegrationTest {
 
     @Test
     void getUserById_shouldReturn200_whenUserExists() throws Exception {
-        mockMvc.perform(get("/users/withTasks/{id}", 1))
+        mockMvc.perform(get("/users/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("sbs@example.com"));
     }
 
     @Test
     void getUserById_shouldReturn404_whenUserDoesNotExist() throws Exception {
-        mockMvc.perform(get("/users/withTasks/{id}", 999))
+        mockMvc.perform(get("/users/{id}", 999))
                 .andExpect(status().isNotFound());
     }
 }
