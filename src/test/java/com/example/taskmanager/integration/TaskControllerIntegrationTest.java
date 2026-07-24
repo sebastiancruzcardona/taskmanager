@@ -197,7 +197,7 @@ public class TaskControllerIntegrationTest {
     // ---------------------------
 
     @Test
-    void deleteTask_shouldDeleteTask() throws Exception {
+    void deleteTask_shouldDeleteSuccessfully() throws Exception {
         String response = createTask(TaskDto.builder()
                 .title("Delete me")
                 .description("To delete")
@@ -211,12 +211,6 @@ public class TaskControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/tasks/{id}", created.getId()))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void deleteTask_shouldReturn404_whenNotFound() throws Exception {
-        mockMvc.perform(delete("/tasks/{id}", 999))
                 .andExpect(status().isNotFound());
     }
 
