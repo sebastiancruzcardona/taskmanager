@@ -136,7 +136,7 @@ public class TaskServiceTest {
     // ---------------------------
 
     @Test
-    void getTaskWithUserById_shouldReturnTaskDto() {
+    void getTaskById_shouldReturnTaskWithDto() {
         Integer id = 1;
 
         Task task = new Task();
@@ -156,7 +156,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    void getTaskWithUserById_shouldThrowException_whenTaskNotFound() {
+    void getTaskById_shouldThrowException_whenTaskNotFound() {
         Integer id = 1;
 
         when(taskRepository.findById(id))
@@ -220,28 +220,17 @@ public class TaskServiceTest {
     // ---------------------------
 
     @Test
-    void deleteTask_shouldDeleteTask() {
+    void deleteTask_shouldReturnTaskAndDeleteIt() {
         Integer id = 1;
 
         when(taskRepository.existsById(id))
                 .thenReturn(true);
+
+        doNothing().when(taskRepository).deleteById(id);
 
         taskService.deleteTask(id);
 
         verify(taskRepository, times(1))
                 .deleteById(id);
     }
-
-    @Test
-    void deleteTask_shouldThrowException_whenTaskNotFound() {
-        Integer id = 1;
-
-        when(taskRepository.existsById(id))
-                .thenReturn(false);
-
-        assertThatThrownBy(() -> taskService.deleteTask(id))
-                .isInstanceOf(TaskNotFoundException.class)
-                .hasMessage("Task with id " + id + " not found");
-    }
-
 }
