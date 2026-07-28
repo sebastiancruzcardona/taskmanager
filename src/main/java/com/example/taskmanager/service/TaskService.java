@@ -108,6 +108,16 @@ public class TaskService {
         return modelMapper.map(updatedTask, TaskDto.class);
     }
 
+    /*public void updateTasks() {
+        List<Task> tasks = taskRepository.findAll();
+
+        tasks.forEach(task -> {
+            task.setTask_status_id(taskStatusService.getByCode(task.getStatus()));
+        });
+
+        taskRepository.saveAll(tasks);
+    }*/
+
     public void deleteTask(Integer id) {
 
         log.info("Deleting task with id: {}", id);
