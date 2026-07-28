@@ -26,9 +26,13 @@ public class Task {
     @Column(name = "description", nullable = true)
     private String description;
 
-    @Column(name = "status", nullable = false)
+    /*@Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING) // This is an enum and the db wants it as a String
-    private TaskStatusEnum status;
+    private TaskStatusEnum status;*/
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_status_id", nullable = false)
+    private TaskStatus status;
 
     // insertable = false -> tells hibernate don't include this in the insert to force default now() in db
     // updatable = false -> tells hibernate that it won't try to update this later
