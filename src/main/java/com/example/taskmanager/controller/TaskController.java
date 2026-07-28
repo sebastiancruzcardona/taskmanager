@@ -50,6 +50,13 @@ public class TaskController {
        return ResponseEntity.ok(taskService.updateTask(id, taskDto));
     }
 
+    // Temporary migration helper endpoint
+    /*@PutMapping
+    public ResponseEntity<Void> updateTasks() {
+        taskService.updateTasks();
+        return ResponseEntity.ok().build();
+    }*/
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Integer id) {
         taskService.deleteTask(id);
