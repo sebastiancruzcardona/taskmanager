@@ -15,7 +15,7 @@ public class TaskStatusService {
 
     private final TaskStatusRepository taskStatusRepository;
 
-    // @Cacheable("taskStatuses") -> This will be added later
+    @Cacheable("taskStatuses")
     public TaskStatus getByCode(TaskStatusEnum taskStatusEnum) {
         log.info("Fetching TaskStatus '{}' from database",  taskStatusEnum);
         return taskStatusRepository.findTaskStatusByCode(taskStatusEnum)
