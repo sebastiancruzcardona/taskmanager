@@ -23,17 +23,23 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
     private final TasksFileParser parser;
+    private final TaskStatusService taskStatusService;
 
     public TaskDto createTask(TaskDto taskDto) {
 
         log.info("Creating task with title: {}", taskDto.getTitle());
 
         Task task = modelMapper.map(taskDto, Task.class);
+        task.setStatus(taskStatusService.getByCode(taskDto.getStatus()));
+
         Task savedTask = taskRepository.save(task);
 
         log.info("Task created successfully with id: {}", savedTask.getId());
 
-        return modelMapper.map(savedTask, TaskDto.class);
+        TaskDto adjustedTaskDto = modelMapper.map(savedTask, TaskDto.class);
+        adjustedTaskDto.setStatus(savedTask.getStatus().getCode());
+
+        return adjustedTaskDto;
     }
 
     public int createMultipleTasks(MultipartFile file) {
@@ -44,7 +50,11 @@ public class TaskService {
 
         List<Task> tasks = taskDtos
                 .stream()
-                .map(taskDto -> modelMapper.map(taskDto, Task.class))
+                .map(taskDto -> {
+                    Task task = modelMapper.map(taskDto, Task.class);
+                    task.setStatus(taskStatusService.getByCode(taskDto.getStatus()));
+                    return task;
+                })
                 .toList();
 
         taskRepository.saveAll(tasks);
@@ -99,7 +109,7 @@ public class TaskService {
 
         existingTask.setTitle(taskDto.getTitle());
         existingTask.setDescription(taskDto.getDescription());
-        existingTask.setStatus(taskDto.getStatus());
+        existingTask.setStatus(taskStatusService.getByCode(taskDto.getStatus()));
 
         Task updatedTask = taskRepository.save(existingTask);
 
