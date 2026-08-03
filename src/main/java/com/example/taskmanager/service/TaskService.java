@@ -77,7 +77,12 @@ public class TaskService {
         log.info("Fetched {} tasks from database", tasksPage.getNumberOfElements());
 
         return tasksPage
-                .map(task -> modelMapper.map(task, TaskDto.class));
+                .map(task -> {
+                    TaskDto taskDto = modelMapper.map(task, TaskDto.class);
+                    taskDto.setStatus(task.getStatus().getCode());
+
+                    return taskDto;
+                });
     }
 
     public TaskWithUserDto getTaskById(Integer id) {
@@ -87,7 +92,9 @@ public class TaskService {
         return taskRepository.findById(id)
                 .map(task -> {
                     log.debug("Task found. Id: {}", task.getId());
-                    return modelMapper.map(task, TaskWithUserDto.class);
+                    TaskWithUserDto taskDto = modelMapper.map(task, TaskWithUserDto.class);
+                    taskDto.setStatus(task.getStatus().getCode());
+                    return taskDto;
                 })
                 .orElseThrow(() -> {
                     log.error("Task with id {} not found", id);
@@ -115,7 +122,10 @@ public class TaskService {
 
         log.info("Task with id {} updated successfully", updatedTask.getId());
 
-        return modelMapper.map(updatedTask, TaskDto.class);
+        TaskDto returnedTaskDto = modelMapper.map(updatedTask, TaskDto.class);
+        returnedTaskDto.setStatus(updatedTask.getStatus().getCode());
+
+        return returnedTaskDto;
     }
 
     /*public void updateTasks() {

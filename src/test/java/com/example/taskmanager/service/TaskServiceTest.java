@@ -2,8 +2,10 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.dto.TaskWithUserDto;
+import com.example.taskmanager.enums.TaskStatusEnum;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
+import com.example.taskmanager.model.TaskStatus;
 import com.example.taskmanager.parser.TasksFileParser;
 import com.example.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,9 @@ public class TaskServiceTest {
     private ModelMapper modelMapper;
 
     @Mock
+    private TaskStatusService taskStatusService;
+
+    @Mock
     private TasksFileParser parser;
 
     @InjectMocks
@@ -50,6 +55,7 @@ public class TaskServiceTest {
 
         Task savedTask = new Task();
         savedTask.setId(1);
+        savedTask.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
 
         TaskDto returnedDto = new TaskDto();
         returnedDto.setTitle("Learn Spring");
@@ -62,6 +68,11 @@ public class TaskServiceTest {
 
         when(modelMapper.map(savedTask, TaskDto.class))
                 .thenReturn(returnedDto);
+
+        when(taskStatusService.getByCode(returnedDto.getStatus()))
+                .thenReturn(TaskStatus.builder()
+                        .code(TaskStatusEnum.NEW)
+                        .build());
 
         TaskDto result = taskService.createTask(inputDto);
 
@@ -110,10 +121,16 @@ public class TaskServiceTest {
         Pageable pageable = PageRequest.of(0, 5, sort);
 
         Task task1 = new Task();
+        task1.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
+
         Task task2 = new Task();
+        task2.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
 
         TaskDto dto1 = new TaskDto();
+        dto1.setStatus(TaskStatusEnum.NEW);
+
         TaskDto dto2 = new TaskDto();
+        dto2.setStatus(TaskStatusEnum.NEW);
 
         when(taskRepository.findAll(pageable))
                 .thenReturn(new PageImpl<>(List.of(task1, task2), pageable, 2));
@@ -141,8 +158,11 @@ public class TaskServiceTest {
 
         Task task = new Task();
         task.setId(id);
+        task.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
 
         TaskWithUserDto dto = new TaskWithUserDto();
+        dto.setId(id);
+        dto.setStatus(TaskStatusEnum.NEW);
 
         when(taskRepository.findById(id))
                 .thenReturn(Optional.of(task));
@@ -180,9 +200,11 @@ public class TaskServiceTest {
 
         Task existingTask = new Task();
         existingTask.setId(id);
+        existingTask.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
 
         Task updatedTask = new Task();
         updatedTask.setId(id);
+        updatedTask.setStatus(TaskStatus.builder().code(TaskStatusEnum.NEW).build());
 
         TaskDto returnedDto = new TaskDto();
         returnedDto.setTitle("Updated");
