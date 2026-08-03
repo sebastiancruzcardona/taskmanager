@@ -3,7 +3,10 @@ package com.example.taskmanager.integration;
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.dto.TaskWithUserDto;
 import com.example.taskmanager.enums.TaskStatusEnum;
+import com.example.taskmanager.model.TaskStatus;
+import com.example.taskmanager.repository.TaskStatusRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +16,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,6 +34,43 @@ public class TaskControllerIntegrationTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    TaskStatusRepository taskStatusRepository;
+
+    @BeforeEach
+    void setUp() {
+        getTaskStatus();
+    }
+
+    private void getTaskStatus() {
+        TaskStatus completedStatus = TaskStatus.builder()
+                .code(TaskStatusEnum.COMPLETED)
+                .description("Completed")
+                .build();
+
+        TaskStatus newStatus = TaskStatus.builder()
+                .code(TaskStatusEnum.NEW)
+                .description("New")
+                .build();
+
+        TaskStatus inProgressStatus = TaskStatus.builder()
+                .code(TaskStatusEnum.IN_PROGRESS)
+                .description("In Progress")
+                .build();
+
+        TaskStatus pendingStatus = TaskStatus.builder()
+                .code(TaskStatusEnum.PENDING)
+                .description("Pending")
+                .build();
+
+        taskStatusRepository.saveAll(List.of(
+                completedStatus,
+                newStatus,
+                inProgressStatus,
+                pendingStatus)
+        );
+    }
 
     // ---------------------------
     // POST /tasks
@@ -141,7 +183,8 @@ public class TaskControllerIntegrationTest {
 
         mockMvc.perform(get("/tasks/{id}", created.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Find me"));
+                .andExpect(jsonPath("$.title").value("Find me"))
+                .andExpect(jsonPath("$.status").value(TaskStatusEnum.NEW.name()));
     }
 
     @Test
