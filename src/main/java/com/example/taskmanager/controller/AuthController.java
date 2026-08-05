@@ -18,9 +18,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
-        authService.login(request.getEmail(), request.getPassword());
-
-        return ResponseEntity.ok("Login Successful");
+        return ResponseEntity.ok(
+                authService.login(request.getEmail(), request.getPassword())
+        );
     }
 
     @PostMapping("/signup")

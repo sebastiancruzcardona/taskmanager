@@ -3,6 +3,7 @@ package com.example.taskmanager.service;
 import com.example.taskmanager.dto.AuthRequestDto;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,9 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public void login(String email, String password) {
+    public String login(String email, String password) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
@@ -25,6 +27,8 @@ public class AuthService {
         if(!passwordMatches) {
             throw new RuntimeException("Invalid credentials");
         }
+
+        return jwtUtil.generateToken(email);
     }
 
     public void signup(AuthRequestDto request) {
