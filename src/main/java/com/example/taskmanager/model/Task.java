@@ -1,6 +1,5 @@
 package com.example.taskmanager.model;
 
-import com.example.taskmanager.enums.TaskStatusEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,14 +25,14 @@ public class Task {
     @Column(name = "description", nullable = true)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_status_id", nullable = false)
-    private TaskStatus status;
-
     // insertable = false -> tells hibernate don't include this in the insert to force default now() in db
     // updatable = false -> tells hibernate that it won't try to update this later
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_status_id", nullable = false)
+    private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
