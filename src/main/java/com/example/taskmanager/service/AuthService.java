@@ -1,5 +1,6 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.dto.AuthRequestDto;
 import com.example.taskmanager.model.User;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public void login(String username, String password) {
+    public void login(String email, String password) {
 
-        User user = userRepository.findByEmail(username)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         // password validation
@@ -24,5 +25,25 @@ public class AuthService {
         if(!passwordMatches) {
             throw new RuntimeException("Invalid credentials");
         }
+    }
+
+    public void signup(AuthRequestDto request) {
+
+        // Check if user already exists
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("User already exists");
+        }
+
+        // Hash password
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+
+        // Create the user
+        User user = new User();
+        user.setName(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(hashedPassword);
+
+        // Save user
+        userRepository.save(user);
     }
 }

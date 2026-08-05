@@ -1,6 +1,6 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.dto.LoginRequestDto;
+import com.example.taskmanager.dto.AuthRequestDto;
 import com.example.taskmanager.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +17,17 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDto request) {
+    public ResponseEntity<String> login(@RequestBody AuthRequestDto request) {
         authService.login(request.getEmail(), request.getPassword());
 
         return ResponseEntity.ok("Login Successful");
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody AuthRequestDto request) {
+        authService.signup(request);
+
+        return ResponseEntity.ok("User registered successfully");
     }
 
 }
