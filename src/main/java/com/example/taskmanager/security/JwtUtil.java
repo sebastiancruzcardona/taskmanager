@@ -1,5 +1,6 @@
 package com.example.taskmanager.security;
 
+import com.example.taskmanager.enums.RoleEnum;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,10 +19,10 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, RoleEnum role) {
         return Jwts.builder()
                 .subject(email) // who creates it (this goes in the payload)
-                .claim("role", "USER") // key, value (this goes in the payload)
+                .claim("role", role) // key, value (this goes in the payload)
                 .issuedAt(new Date())
                 .expiration(
                         new Date(System.currentTimeMillis() + 60 * 60 * 1000) // 1h
@@ -44,4 +45,15 @@ public class JwtUtil {
                 .getSubject(); // Our goal is to extract the email
     }
 
+    public RoleEnum extractRole(String token) {
+        return RoleEnum.valueOf(
+                Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("role")
+                    .toString()
+        );
+    }
 }
