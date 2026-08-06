@@ -29,7 +29,7 @@ public class AuthService {
             throw new RuntimeException("Invalid credentials");
         }
 
-        return jwtUtil.generateToken(email);
+        return jwtUtil.generateToken(email, user.getRole());
     }
 
     public void signup(AuthRequestDto request) {
