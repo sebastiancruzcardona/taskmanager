@@ -30,4 +30,18 @@ public class JwtUtil {
                 .compact();
     }
 
+    /* Validate the token:
+     - verify the signature
+     - check expiration date
+     - ensure token integrity */
+    public String extractEmail(String token) {
+        // Reverse the token data
+        return Jwts.parser()
+                .setSigningKey(getSigningKey()) // The secret key
+                .build()
+                .parseSignedClaims(token)// Validate signature and the expiration (or throw exception)
+                .getPayload() // The data inside our token. // .get("role") to bring the role
+                .getSubject(); // Our goal is to extract the email
+    }
+
 }
