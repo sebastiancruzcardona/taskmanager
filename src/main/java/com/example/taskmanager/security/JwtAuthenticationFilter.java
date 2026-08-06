@@ -1,11 +1,13 @@
 package com.example.taskmanager.security;
 
+import com.example.taskmanager.enums.RoleEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -44,12 +46,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extract email
             String email = jwtUtil.extractEmail(token);
 
+            // Extract role
+            RoleEnum role = jwtUtil.extractRole(token);
+
             // Create Authentication object (The email and the request are valid, user is authenticated)
             UsernamePasswordAuthenticationToken authentication  =
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            List.of() // The authorization role that te user will have
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role)) // The authorization role that te user will have
                     );
 
             // Attach Authentication object to the security context
