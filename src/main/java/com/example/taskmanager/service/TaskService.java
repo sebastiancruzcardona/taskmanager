@@ -2,15 +2,20 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.dto.TaskWithUserDto;
+import com.example.taskmanager.enums.RoleEnum;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.parser.TasksFileParser;
 import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,21 +90,33 @@ public class TaskService {
                 });
     }
 
-    public TaskWithUserDto getTaskById(Integer id) {
+    public TaskWithUserDto getTaskById(AuthenticatedUser currentUser, Integer id) {
 
         log.info("Fetching task with user with id: {}", id);
 
-        return taskRepository.findById(id)
-                .map(task -> {
-                    log.debug("Task found. Id: {}", task.getId());
-                    TaskWithUserDto taskDto = modelMapper.map(task, TaskWithUserDto.class);
-                    taskDto.setStatus(task.getStatus().getCode());
-                    return taskDto;
-                })
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        AuthenticatedUser authenticatedUser = (AuthenticatedUser) authentication.getPrincipal();
+
+        // Fetch the task or throw exception if not found
+        Task task = taskRepository.findById(id) // better pattern would be findByIdAndEmail(id, email)
                 .orElseThrow(() -> {
                     log.error("Task with id {} not found", id);
                     return new TaskNotFoundException(id);
                 });
+
+        // Enforce ownership: only the owner or ADMIN can access
+        if (currentUser.getRole() != RoleEnum.ADMIN && task.getUser() != null &&
+                !task.getUser().getEmail().equals(currentUser.getEmail())) { // better with getId, because id never changes
+            log.error("User {} is not allowed to access task with id {}", currentUser.getEmail(), id);
+            throw new AccessDeniedException("You do not own this task");
+        }
+
+        // Map entity to DTO
+        TaskWithUserDto taskDto = modelMapper.map(task, TaskWithUserDto.class);
+        taskDto.setStatus(task.getStatus().getCode());
+
+        log.debug("Returning task DTO for task id {}", task.getId());
+        return taskDto;
     }
 
     public TaskDto updateTask(Integer id, TaskDto taskDto) {

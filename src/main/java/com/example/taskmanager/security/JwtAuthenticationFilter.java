@@ -43,16 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Validate JWT
         try {
-            // Extract email
+            // Extract email and role
             String email = jwtUtil.extractEmail(token);
-
-            // Extract role
             RoleEnum role = jwtUtil.extractRole(token);
+
+            AuthenticatedUser principal = new AuthenticatedUser(email, role);
 
             // Create Authentication object (The email and the request are valid, user is authenticated)
             UsernamePasswordAuthenticationToken authentication  =
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            principal,
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role)) // The authorization role that te user will have
                     );

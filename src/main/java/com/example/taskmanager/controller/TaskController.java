@@ -2,6 +2,7 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.TaskDto;
 import com.example.taskmanager.dto.TaskWithUserDto;
+import com.example.taskmanager.security.AuthenticatedUser;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,8 +40,11 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskWithUserDto> getTaskWithUserById(@PathVariable Integer id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
+    public ResponseEntity<TaskWithUserDto> getTaskWithUserById(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable Integer id
+    ) {
+        return ResponseEntity.ok(taskService.getTaskById(authenticatedUser, id));
     }
 
     @PutMapping("/{id}")
